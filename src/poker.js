@@ -1,3 +1,6 @@
+import {Card} from "./model/Card.js";
+import {Player} from "./model/Player.js";
+
 //kartya lapok definialasa
 const colors = [
     'diamonds', 'spades', 'heart', 'clubs'
@@ -36,81 +39,6 @@ var utils = {
     }
 };
 
-class Card {
-    constructor(value, color) {
-        this.value = value;
-        this.color = color;
-    }
-
-    getValue() {
-        return this.value;
-    }
-
-    getColor() {
-        return this.color;
-    }
-
-    getAliasValue() {
-        let aliasValue = this.value;
-        if(aliasValue > 10) {
-            aliasValue === 11 ? aliasValue = 'J' :
-                (aliasValue === 12 ? aliasValue = 'Q' :
-                    (aliasValue === 13 ? aliasValue = 'K' : aliasValue = 'A'));
-        }
-        return aliasValue;
-    }
-
-    createHandString(strings, ...values) {
-        let result = "";
-        result += strings[0];
-        result += values[0];
-        result += strings[1];
-        result += values[1];
-        result += strings[2];
-        return result;
-    }
-}
-
-// import {Player} from "./Player.js";
-
-class Player {
-    constructor(hand) {
-        this.hand = hand;
-        this.rank = this.getRank();
-    }
-
-    getHandValues() {
-        var handValues = [];
-        this.hand.forEach(function(card) {
-            handValues.push(card.getValue());
-        });
-        return handValues.sort(this.sortValue);
-    }
-
-    getHandColors() {
-        var handColors = [];
-        this.hand.forEach(function(card) {
-            handColors.push(card.getColor());
-        });
-        return handColors.sort();
-    }
-
-    sortValue(a, b) {
-        return a - b;
-    }
-
-    getRank() {
-        let values = this.getHandValues(),
-            rank = 0;
-        values.forEach((value, index) => {
-            rank += value / (5 - index) + (values[4] * 2);
-        });
-        return rank;
-    }
-}
-
-
-// node_modules\.bin\babel src -d lib
 
 utils.ready(main);
 

@@ -1,4 +1,3 @@
-// import {Card} from "./Card.js";
 class Player {
     constructor(hand) {
         this.hand = hand;
@@ -35,4 +34,4 @@ class Player {
     }
 }
 
-// export {Player};
+export {Player};
