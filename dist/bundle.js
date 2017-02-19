@@ -4,6 +4,28 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+var colors = ['diamonds', 'spades', 'heart', 'clubs'];
+
+var ranks = {
+    'ROYALFLUSH': 350000,
+    'FLUSH': 120000,
+    'STRAIGHT': 100000,
+    'STRAGIHTFLUSH': 50000,
+    'FULLHOUSE': 150000,
+    'POKER': 200000,
+    "THREEOFAKIND": 50000,
+    'PAIR': 20000
+};
+
+exports.colors = colors;
+exports.ranks = ranks;
+
+},{}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -54,7 +76,7 @@ var Card = function () {
 
 exports.Card = Card;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -113,33 +135,147 @@ var Player = function () {
 
 exports.Player = Player;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
-var _templateObject = _taggedTemplateLiteral(["Value: ", " Color: ", "<br/>"], ["Value: ", " Color: ", "<br/>"]);
+var _constants = require("./constants.js");
+
+var _utils = require("./utils.js");
+
+_utils.utils.ready(main);
+
+function main() {
+
+    //todo: feluleten lehessen megadni a jatekosok szamat
+    var numberOfPlayers = 4,
+        players = _utils.utils.deal(numberOfPlayers);
+
+    if (numberOfPlayers > 10) {
+        alert('Too many players!');
+        return false;
+    }
+
+    //vegig megyunk az osszes jatekoson, es eldontjuk kinek mije van
+    players.forEach(function (player, index) {
+        _utils.utils.renderPlayerHand(player, index);
+
+        var handColors = player.getHandColors(),
+            handValues = player.getHandValues(),
+            result = document.querySelector('.result' + index);
+
+        var flush = _utils.utils.isFlush(handColors),
+            duplicatums = [],
+            isUnique = _utils.utils.isUnique(handValues, duplicatums);
+
+        if (flush) {
+            if (_utils.utils.isRoyal(handValues, isUnique)) {
+                result.innerHTML = 'Royal flush! ';
+                player.rank += _constants.ranks.ROYALFLUSH;
+                return false;
+            } else {
+                result.innerHTML = 'Flush ';
+                player.rank += _constants.ranks.FLUSH + handValues[0];
+            }
+        }
+
+        if (_utils.utils.isStraight(handValues, isUnique)) {
+            result.innerHTML = 'Straight ';
+            player.rank += _constants.ranks.STRAIGHT + handValues[0];
+            if (flush) {
+                result.innerHTML = 'Straightflush ';
+                player.rank += _constants.ranks.STRAGIHTFLUSH + handValues[0];
+            }
+            return false;
+        }
+
+        duplicatums.sort(_utils.utils.valueSort);
+
+        if (_utils.utils.isFullHouse(duplicatums)) {
+            result.innerHTML = 'Full house! ';
+            player.rank += _constants.ranks.FULLHOUSE + duplicatums[0] + duplicatums[2];
+            return false;
+        }
+
+        if (_utils.utils.isPoker(duplicatums)) {
+            result.innerHTML = 'Four of a kind (poker)! ';
+            player.rank += _constants.ranks.POKER + duplicatums[0];
+            return false;
+        }
+
+        //parok keresese
+        if (!isUnique) {
+            duplicatums.forEach(function (value, key) {
+                if (value === duplicatums[key + 1]) {
+                    result.innerHTML += _utils.utils.getAlias(value) + " three of a kind ";
+                    player.rank += _constants.ranks.THREEOFAKIND + value * value * 100;
+                } else if (value !== duplicatums[key - 1]) {
+                    player.rank += _constants.ranks.PAIR + value * value * 25;
+                    result.innerHTML += _utils.utils.getAlias(value) + " pair ";
+                }
+            });
+        } else if (!flush) {
+            result.innerHTML = _utils.utils.getAlias(handValues[4]) + ' high card ';
+            return false;
+        }
+    });
+
+    //a beallitott rankok alapjan kiosztjuk a helyeket
+    _utils.utils.givePlaces(players);
+    players.forEach(function (player, index) {
+        var result = document.querySelector('.result' + index);
+        result.innerHTML += ', Place: ' + player.place;
+    });
+}
+
+},{"./constants.js":1,"./utils.js":5}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.utils = undefined;
+
+var _templateObject = _taggedTemplateLiteral(["<div class=\"result result", "\"></div>"], ["<div class=\"result result", "\"></div>"]),
+    _templateObject2 = _taggedTemplateLiteral(["<div class=\"hand", "\"></div>"], ["<div class=\"hand", "\"></div>"]),
+    _templateObject3 = _taggedTemplateLiteral(["Value: ", " Color: ", "<br/>"], ["Value: ", " Color: ", "<br/>"]);
 
 var _Card = require("./model/Card.js");
 
 var _Player = require("./model/Player.js");
 
-function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+var _constants = require("./constants.js");
 
-//kartya lapok definialasa
-var colors = ['diamonds', 'spades', 'heart', 'clubs'];
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 var utils = {
     valueSort: function valueSort(a, b) {
         return a - b;
     },
+    /**
+     * A 10.nel nagyobb lapokhoz betujeket tarsit
+     * @param value
+     * @returns {*}
+     */
     getAlias: function getAlias(value) {
         if (value > 10) {
             value === 11 ? value = 'J' : value === 12 ? value = 'Q' : value === 13 ? value = 'K' : value = 'A';
         }
         return value;
     },
+    /**
+     * Adott intervallumban visszaad egy random egesz szamot
+     *
+     * @param min
+     * @param max
+     * @returns {*}
+     */
     getRandomInt: function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
+    /**
+     * jQuery readyhez hasonlo mukodes
+     * @param fn
+     */
     ready: function ready(fn) {
         if (document.readyState != 'loading') {
             fn();
@@ -147,6 +283,10 @@ var utils = {
             document.addEventListener('DOMContentLoaded', fn);
         }
     },
+    /**
+     * Rank alapjan sorba rakjuk a jatekosokat
+     * @param players
+     */
     givePlaces: function givePlaces(players) {
         players.forEach(function (player) {
             var place = 1;
@@ -157,147 +297,92 @@ var utils = {
             });
             player.place = place;
         });
+    },
+    /**
+     * osztas
+     * @returns {Array}
+     */
+    deal: function deal(numberOfPlayers) {
+        var players = [],
+            usedCards = [];
+        for (var i = 0; i < numberOfPlayers; i++) {
+            var hand = [];
+            for (var _i = 0; _i < 5; _i++) {
+                var actualValue = this.getRandomInt(2, 14),
+                    actualColor = _constants.colors[this.getRandomInt(0, 3)],
+                    actualCard = new _Card.Card(actualValue, actualColor);
+
+                if (JSON.stringify(usedCards).indexOf(JSON.stringify(actualCard)) !== -1) {
+                    _i--;
+                } else {
+                    hand[_i] = actualCard;
+                    usedCards.push(hand[_i]);
+                }
+            }
+            players.push(new _Player.Player(hand));
+        }
+
+        return players;
+    },
+
+    renderPlayerHand: function renderPlayerHand(player, index) {
+        document.querySelector('body').innerHTML += utils.createInsertString(_templateObject, index);
+        document.querySelector('body').innerHTML += utils.createInsertString(_templateObject2, index);
+        var handElement = document.querySelector('.hand' + index);
+        player.hand.forEach(function (card) {
+            handElement.innerHTML += card.createHandString(_templateObject3, card.getAliasValue(), card.getColor());
+        });
+    },
+
+    isFlush: function isFlush(handColors) {
+        return handColors[0] === handColors[4];
+    },
+
+    isRoyal: function isRoyal(handValues, isUnique) {
+        return isUnique && handValues[0] === 10 && handValues[4] === 14;
+    },
+
+    isStraight: function isStraight(handValues, isUnique) {
+        return isUnique && (handValues[4] - handValues[0] === 4 || handValues[4] === 14 && handValues[3] === 5);
+    },
+
+    isFullHouse: function isFullHouse(duplicatums) {
+        return duplicatums.length === 3 && duplicatums[0] !== duplicatums[2];
+    },
+
+    isPoker: function isPoker(duplicatums) {
+        return duplicatums.length === 3 && !this.isFullHouse();
+    },
+
+    /**
+     * @param {Array} strings
+     * @param {Array} values
+     * @returns {string}
+     */
+    createInsertString: function createInsertString(strings) {
+        var result = "";
+        result += strings[0];
+        result += arguments.length <= 1 ? undefined : arguments[1];
+        result += strings[1];
+        return result;
+    },
+    /**
+     * @param {Array} handValues
+     * @param {Array} duplicatums
+     * @returns {boolean}
+     */
+    isUnique: function isUnique(handValues, duplicatums) {
+        var isUnique = true;
+        handValues.forEach(function (value, i) {
+            if (!!handValues[i + 1] && handValues[i + 1] == value) {
+                isUnique = false;
+                duplicatums.push(value);
+            }
+        });
+        return isUnique;
     }
 };
 
-// node_modules\.bin\babel src -d lib
+exports.utils = utils;
 
-utils.ready(main);
-
-function main() {
-
-    //jatekosok meghatarozasa
-    var numberOfPlayers = 4,
-        players = [],
-        usedCards = [];
-
-    if (numberOfPlayers > 10) {
-        alert('Too many players!');
-        return false;
-    }
-    //osztas
-    for (var i = 0; i < numberOfPlayers; i++) {
-        var hand = [];
-        for (var _i = 0; _i < 5; _i++) {
-            var actualValue = utils.getRandomInt(2, 14),
-                actualColor = colors[utils.getRandomInt(0, 3)],
-                actualCard = new _Card.Card(actualValue, actualColor);
-
-            // TODO: ES6 equals fuggveny (felul)definialasa?
-            if (JSON.stringify(usedCards).indexOf(JSON.stringify(actualCard)) !== -1) {
-                console.log('if');
-                _i--;
-            } else {
-                hand[_i] = actualCard;
-                usedCards.push(hand[_i]);
-            }
-        }
-        players[i] = new _Player.Player(hand);
-    }
-
-    /**
-     * vegig megyunk az osszes jatekoson, es eldontjuk kinek mije van
-     */
-    players.forEach(function (player, index) {
-        document.querySelector('body').innerHTML += '<div class="result result' + index + '"></div>';
-        document.querySelector('body').innerHTML += '<div class="hand' + index + '"></div>';
-
-        var handColors = player.getHandColors(),
-            handValues = player.getHandValues(),
-
-
-        //DOM elements
-        result = document.querySelector('.result' + index),
-            handElement = document.querySelector('.hand' + index);
-
-        player.hand.forEach(function (card) {
-            handElement.innerHTML += card.createHandString(_templateObject, card.getAliasValue(), card.getColor());
-        });
-
-        //flush detektalas
-        var flush = false;
-        if (handColors[0] === handColors[4]) {
-            flush = true;
-        }
-
-        //sor detektalas
-        var isUnique = true,
-            duplicatums = [];
-
-        //ha sor van, akkor a tomb uniqe
-        for (var _i2 = 0; _i2 < 4; _i2++) {
-            if (handValues[_i2 + 1] == handValues[_i2]) {
-                isUnique = false;
-                duplicatums.push(handValues[_i2]);
-            }
-        }
-
-        if (flush) {
-            if (isUnique && handValues[0] === 10 && handValues[4] === 14) {
-                result.innerHTML = 'Royal flush! ';
-                player.rank += 350000;
-                // result.innerHTML += 'Rank: ' + player.rank;
-                return false;
-            } else {
-                result.innerHTML = 'Flush ';
-                player.rank += 120000 + handValues[0];
-                // result.innerHTML += 'Rank: ' + player.rank;
-            }
-        }
-
-        if (isUnique && (handValues[4] - handValues[0] === 4 || handValues[4] === 14 && handValues[3] === 5)) {
-            result.innerHTML = 'Straight ';
-            player.rank += 100000 + handValues[0];
-            // result.innerHTML += 'Rank: ' + player.rank;
-            if (flush) {
-                player.rank += 50000 + handValues[0];
-                result.innerHTML = 'Straightflush ';
-                // result.innerHTML += 'Rank: ' + player.rank;
-            }
-            return false;
-        }
-
-        duplicatums.sort(utils.valueSort);
-
-        if (duplicatums.length === 3) {
-            if (duplicatums[0] !== duplicatums[2]) {
-                result.innerHTML = 'Full house! ';
-                player.rank += 150000 + duplicatums[0] + duplicatums[2];
-                // result.innerHTML += 'Rank: ' + player.rank;
-            } else {
-                player.rank += 200000 + duplicatums[0];
-                result.innerHTML = 'Four of a kind (poker)! ';
-                // result.innerHTML += 'Rank: ' + player.rank;
-            }
-            return false;
-        }
-
-        //parok keresese
-        if (!isUnique) {
-            duplicatums.forEach(function (value, key) {
-                if (value === duplicatums[key + 1]) {
-                    result.innerHTML += utils.getAlias(value) + " three of a kind ";
-                    player.rank += 50000 + value * value * 100;
-                } else if (value !== duplicatums[key - 1]) {
-                    player.rank += 20000 + value * value * 25;
-                    result.innerHTML += utils.getAlias(value) + " pair ";
-                }
-            });
-
-            // result.innerHTML += 'Rank: ' + player.rank;
-        } else if (!flush) {
-            result.innerHTML = utils.getAlias(handValues[4]) + ' high card ';
-            // result.innerHTML += 'Rank: ' + player.rank;
-            return false;
-        }
-    });
-
-    //a beallitott rankok alapjan kiosztjuk a helyeket
-    utils.givePlaces(players);
-    players.forEach(function (player, index) {
-        var result = document.querySelector('.result' + index);
-        result.innerHTML += ', Place: ' + player.place;
-    });
-}
-
-},{"./model/Card.js":1,"./model/Player.js":2}]},{},[3]);
+},{"./constants.js":1,"./model/Card.js":2,"./model/Player.js":3}]},{},[4]);
