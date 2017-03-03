@@ -9,7 +9,7 @@ const ranks = {
     'STRAGIHTFLUSH': 50000,
     'FULLHOUSE': 150000,
     'POKER': 200000,
-    "THREEOFAKIND": 50000,
+    'THREEOFAKIND': 50000,
     'PAIR': 20000
 };
 

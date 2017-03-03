@@ -23,7 +23,7 @@ class Card {
     }
 
     createHandString(strings, ...values) {
-        let result = "";
+        let result = '';
         result += strings[0];
         result += values[0];
         result += strings[1];

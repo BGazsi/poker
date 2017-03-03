@@ -1,6 +1,6 @@
-import {Card} from "./model/Card.js";
-import {Player} from "./model/Player.js";
-import {colors} from "./constants.js";
+import {Card} from './model/Card.js';
+import {Player} from './model/Player.js';
+import {colors} from './constants.js';
 
 let utils = {
     valueSort: function(a, b) {
@@ -115,7 +115,7 @@ let utils = {
      * @returns {string}
      */
     createInsertString: function(strings, ...values) {
-        let result = "";
+        let result = '';
         result += strings[0];
         result += values[0];
         result += strings[1];

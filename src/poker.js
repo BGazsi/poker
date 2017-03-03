@@ -1,5 +1,5 @@
-import {ranks} from "./constants.js";
-import {utils} from "./utils.js";
+import {ranks} from './constants.js';
+import {utils} from './utils.js';
 
 
 utils.ready(main);
@@ -66,11 +66,11 @@ function main() {
         if(!isUnique) {
             duplicatums.forEach((value, key) => {
                 if(value === duplicatums[key + 1]) {
-                    result.innerHTML += utils.getAlias(value) + " three of a kind ";
+                    result.innerHTML += utils.getAlias(value) + ' three of a kind ';
                     player.rank += ranks.THREEOFAKIND + (value * value * 100);
                 } else if(value !== duplicatums[key - 1]){
                     player.rank += ranks.PAIR + (value * value * 25);
-                    result.innerHTML += utils.getAlias(value) + " pair ";
+                    result.innerHTML += utils.getAlias(value) + ' pair ';
                 }
             });
         } else if(!flush) {
@@ -84,5 +84,5 @@ function main() {
     players.forEach((player, index) => {
         let result = document.querySelector('.result' + index);
         result.innerHTML += ', Place: ' + player.place;
-    })
+    });
 }
