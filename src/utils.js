@@ -8,7 +8,7 @@ let utils = {
     },
     /**
      * A 10.nel nagyobb lapokhoz betujeket tarsit
-     * @param value
+     * @param value int
      * @returns {*}
      */
     getAlias: function(value) {
