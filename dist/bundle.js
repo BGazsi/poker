@@ -13,7 +13,7 @@ var ranks = {
     'STRAGIHTFLUSH': 50000,
     'FULLHOUSE': 150000,
     'POKER': 200000,
-    "THREEOFAKIND": 50000,
+    'THREEOFAKIND': 50000,
     'PAIR': 20000
 };
 
@@ -61,7 +61,7 @@ var Card = function () {
     }, {
         key: 'createHandString',
         value: function createHandString(strings) {
-            var result = "";
+            var result = '';
             result += strings[0];
             result += arguments.length <= 1 ? undefined : arguments[1];
             result += strings[1];
@@ -136,11 +136,11 @@ var Player = function () {
 exports.Player = Player;
 
 },{}],4:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _constants = require("./constants.js");
+var _constants = require('./constants.js');
 
-var _utils = require("./utils.js");
+var _utils = require('./utils.js');
 
 _utils.utils.ready(main);
 
@@ -206,11 +206,11 @@ function main() {
         if (!isUnique) {
             duplicatums.forEach(function (value, key) {
                 if (value === duplicatums[key + 1]) {
-                    result.innerHTML += _utils.utils.getAlias(value) + " three of a kind ";
+                    result.innerHTML += _utils.utils.getAlias(value) + ' three of a kind ';
                     player.rank += _constants.ranks.THREEOFAKIND + value * value * 100;
                 } else if (value !== duplicatums[key - 1]) {
                     player.rank += _constants.ranks.PAIR + value * value * 25;
-                    result.innerHTML += _utils.utils.getAlias(value) + " pair ";
+                    result.innerHTML += _utils.utils.getAlias(value) + ' pair ';
                 }
             });
         } else if (!flush) {
@@ -228,22 +228,22 @@ function main() {
 }
 
 },{"./constants.js":1,"./utils.js":5}],5:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.utils = undefined;
 
-var _templateObject = _taggedTemplateLiteral(["<div class=\"result result", "\"></div>"], ["<div class=\"result result", "\"></div>"]),
-    _templateObject2 = _taggedTemplateLiteral(["<div class=\"hand", "\"></div>"], ["<div class=\"hand", "\"></div>"]),
-    _templateObject3 = _taggedTemplateLiteral(["Value: ", " Color: ", "<br/>"], ["Value: ", " Color: ", "<br/>"]);
+var _templateObject = _taggedTemplateLiteral(['<div class="result result', '"></div>'], ['<div class="result result', '"></div>']),
+    _templateObject2 = _taggedTemplateLiteral(['<div class="hand', '"></div>'], ['<div class="hand', '"></div>']),
+    _templateObject3 = _taggedTemplateLiteral(['Value: ', ' Color: ', '<br/>'], ['Value: ', ' Color: ', '<br/>']);
 
-var _Card = require("./model/Card.js");
+var _Card = require('./model/Card.js');
 
-var _Player = require("./model/Player.js");
+var _Player = require('./model/Player.js');
 
-var _constants = require("./constants.js");
+var _constants = require('./constants.js');
 
 function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
@@ -253,7 +253,7 @@ var utils = {
     },
     /**
      * A 10.nel nagyobb lapokhoz betujeket tarsit
-     * @param value
+     * @param value int
      * @returns {*}
      */
     getAlias: function getAlias(value) {
@@ -360,7 +360,7 @@ var utils = {
      * @returns {string}
      */
     createInsertString: function createInsertString(strings) {
-        var result = "";
+        var result = '';
         result += strings[0];
         result += arguments.length <= 1 ? undefined : arguments[1];
         result += strings[1];

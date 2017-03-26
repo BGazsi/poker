@@ -4,7 +4,8 @@
   "description": "poker app",
   "main": "poker.js",
   "scripts": {
-    "build": "browserify src/poker.js -o dist/bundle.js -t [ babelify --presets [ es2015 ] ]"
+    "build": "browserify src/poker.js -o dist/bundle.js -t [ babelify --presets [ es2015 ] ]",
+    "dev": "eslint src/**"
   },
   "author": "Bence",
   "license": "ISC",
